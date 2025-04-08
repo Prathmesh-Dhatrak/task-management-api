@@ -2,6 +2,14 @@
 
 A RESTful API for task management with JWT authentication built using Node.js, Express, TypeScript, Prisma and MongoDB.
 
+## Features
+
+- User registration and authentication using JWT
+- Secure task creation, retrieval, updating, and deletion
+- Data validation using Zod
+- Type safety with TypeScript
+- Database persistence with MongoDB and Prisma ORM
+
 ## Tech Stack
 
 - Node.js
@@ -30,7 +38,6 @@ task-management-api/
 │   └── server.ts            # Application entry point
 ├── prisma/
 │   └── schema.prisma        # Database schema
-├── tests/                   # Test files
 ├── .env                     # Environment variables
 ├── .env.example             # Example environment variables
 ├── .gitignore               # Git ignore file
@@ -39,33 +46,67 @@ task-management-api/
 └── README.md                # Project documentation
 ```
 
-## Installation
+## API Documentation
+
+[View the complete Postman collection](https://prathmesh-space-for-work.postman.co/workspace/Prathmesh-Workspace~f93eb07f-6bd8-4f71-8a09-fcd5089ade1e/collection/10954545-757ce36e-f808-43ff-bf82-d747f146fbe7?action=share&creator=10954545)
+
+### Deployed API
+
+Base URL: `https://task-management-api-7zit.onrender.com`
+
+## Installation and Setup
+
+### Prerequisites
+
+- Node.js (v14+)
+- Yarn package manager
+- MongoDB instance (local or Atlas)
+
+### Local Setup
 
 1. Clone the repository
+   ```bash
+   git clone https://github.com/Prathmesh-Dhatrak/task-management-api.git
+   cd task-management-api
+   ```
+
 2. Install dependencies
    ```bash
    yarn install
    ```
+
 3. Configure environment variables
    - Copy `.env.example` to `.env`
+   ```bash
+   cp .env.example .env
+   ```
    - Update the MongoDB connection string and JWT secret
+   ```
+   PORT=3000
+   NODE_ENV=development
+   JWT_SECRET=your_jwt_secret_key
+   JWT_EXPIRY=24h
+   DATABASE_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/task_management_db
+   ```
+
 4. Generate Prisma client
    ```bash
    yarn prisma:generate
    ```
+
 5. Push schema to database
    ```bash
    yarn prisma:push
    ```
 
-## Running the API
+### Running the API
 
-### Development Mode
+#### Development Mode
 ```bash
 yarn dev
 ```
 
-### Production Build
+#### Production Build
 ```bash
 yarn build
 yarn start
@@ -75,34 +116,200 @@ yarn start
 
 ### Authentication
 
-- `POST /api/auth/register` - Register a new user
-  - Body: `{ "name": "User Name", "email": "user@example.com", "password": "password123" }`
+#### Register User
 
-- `POST /api/auth/login` - Login a user
-  - Body: `{ "email": "user@example.com", "password": "password123" }`
+```
+POST /api/auth/register
+```
+
+Request body:
+```json
+{
+  "name": "SomeRandom Name",
+  "email": "some-random-name@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "id": "6123456789abcdef12345678",
+      "name": "SomeRandom Name",
+      "email": "some-random-name@example.com",
+      "createdAt": "2023-07-01T12:00:00.000Z"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+#### Login User
+
+```
+POST /api/auth/login
+```
+
+Request body:
+```json
+{
+  "email": "some-random-name@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": "6123456789abcdef12345678",
+      "name": "SomeRandom Name",
+      "email": "some-random-name@example.com",
+      "createdAt": "2023-07-01T12:00:00.000Z"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
 
 ### Tasks
 
-All task routes require authentication via Bearer token in the Authorization header.
+All task endpoints require authentication. Include the JWT token in the Authorization header:
 
-- `GET /api/tasks` - Get all tasks for the authenticated user
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-- `GET /api/tasks/:id` - Get a specific task by ID
+#### Create Task
 
-- `POST /api/tasks` - Create a new task
-  - Body: `{ "title": "Task title", "description": "Task description", "status": "pending" }`
+```
+POST /api/tasks
+```
 
-- `PATCH /api/tasks/:id` - Update a task
-  - Body: `{ "title": "Updated title", "description": "Updated description", "status": "completed" }`
+Request body:
+```json
+{
+  "title": "Complete project",
+  "description": "Finish the task management API project",
+  "status": "pending"
+}
+```
 
-- `DELETE /api/tasks/:id` - Delete a task
+Response:
+```json
+{
+  "status": "success",
+  "message": "Task created successfully",
+  "data": {
+    "id": "6123456789abcdef12345678",
+    "title": "Complete project",
+    "description": "Finish the task management API project",
+    "status": "pending",
+    "userId": "6123456789abcdef12345678",
+    "createdAt": "2023-07-01T12:00:00.000Z",
+    "updatedAt": "2023-07-01T12:00:00.000Z"
+  }
+}
+```
 
-## Status Options
+#### Get All Tasks
 
-Task status can be one of:
-- `pending`
-- `in-progress`
-- `completed`
+```
+GET /api/tasks
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "message": "Tasks retrieved successfully",
+  "data": [
+    {
+      "id": "6123456789abcdef12345678",
+      "title": "Complete project",
+      "description": "Finish the task management API project",
+      "status": "pending",
+      "userId": "6123456789abcdef12345678",
+      "createdAt": "2023-07-01T12:00:00.000Z",
+      "updatedAt": "2023-07-01T12:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### Get Task by ID
+
+```
+GET /api/tasks/:id
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "message": "Task retrieved successfully",
+  "data": {
+    "id": "6123456789abcdef12345678",
+    "title": "Complete project",
+    "description": "Finish the task management API project",
+    "status": "pending",
+    "userId": "6123456789abcdef12345678",
+    "createdAt": "2023-07-01T12:00:00.000Z",
+    "updatedAt": "2023-07-01T12:00:00.000Z"
+  }
+}
+```
+
+#### Update Task
+
+```
+PATCH /api/tasks/:id
+```
+
+Request body:
+```json
+{
+  "status": "in-progress"
+}
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "message": "Task updated successfully",
+  "data": {
+    "id": "6123456789abcdef12345678",
+    "title": "Complete project",
+    "description": "Finish the task management API project",
+    "status": "in-progress",
+    "userId": "6123456789abcdef12345678",
+    "createdAt": "2023-07-01T12:00:00.000Z",
+    "updatedAt": "2023-07-01T12:30:00.000Z"
+  }
+}
+```
+
+#### Delete Task
+
+```
+DELETE /api/tasks/:id
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "message": "Task deleted successfully"
+}
+```
 
 ## Error Handling
 
@@ -115,13 +322,34 @@ The API returns appropriate HTTP status codes and error messages in a consistent
 }
 ```
 
-## Validation
+## Task Status Options
 
-Input validation is performed using Zod schemas. Invalid requests will return a 400 status code with detailed error messages.
+Task status can be one of:
+- `pending` - Task is yet to be started
+- `in-progress` - Task is currently being worked on
+- `completed` - Task has been completed
 
-## Authentication Flow
+## Deployment Details
 
-1. User registers or logs in
-2. Server returns a JWT token
-3. Client includes the token in the Authorization header for protected routes
-   - Format: `Authorization: Bearer <token>`
+This API is deployed on Render using a web service connected to GitHub. 
+
+### Deployment Configuration
+- **Build Command**: `yarn && yarn prisma:generate && yarn build`
+- **Start Command**: `yarn start`
+- **Environment Variables**: Set all required environment variables in the Render dashboard
+
+### CI/CD
+
+The API is set up with continuous deployment from the GitHub repository. Any push to the main branch triggers a new deployment.
+
+## Security Considerations
+
+- JWT tokens are used for authentication
+- Passwords are hashed before storing in the database
+- Environment variables are used for sensitive information
+- Input validation is performed on all requests
+- MongoDB connection string is protected
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
