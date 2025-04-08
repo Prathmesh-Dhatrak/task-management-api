@@ -77,17 +77,17 @@ Base URL: `https://task-management-api-7zit.onrender.com`
 
 3. Configure environment variables
    - Copy `.env.example` to `.env`
-   ```bash
-   cp .env.example .env
-   ```
+      ```bash
+      cp .env.example .env
+      ```
    - Update the MongoDB connection string and JWT secret
-   ```
-   PORT=3000
-   NODE_ENV=development
-   JWT_SECRET=your_jwt_secret_key
-   JWT_EXPIRY=24h
-   DATABASE_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/task_management_db
-   ```
+      ```
+      PORT=3000
+      NODE_ENV=development
+      JWT_SECRET=your_jwt_secret_key
+      JWT_EXPIRY=24h
+      DATABASE_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/task_management_db
+      ```
 
 4. Generate Prisma client
    ```bash
